@@ -1,0 +1,10 @@
+psycopg2
+pandas
+fastapi
+uvicorn[standard]
+matplotlib
+seaborn
+folium
+numpy
+scikit-learn
+xgboost
