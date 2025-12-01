@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: mini_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: mini_db
+      POSTGRES_USER: mini_user
+      POSTGRES_PASS: mini_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  # app:
+  #   build: .
+  #   container_name: mini_app
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #     DB_NAME: mini_db
+  #     DB_USER: mini_user
+  #     DB_PASSWORD: mini_pass
+  #   command: ["python", "-u", "extract.py"]
+
+volumes:
+  db_data: {}
