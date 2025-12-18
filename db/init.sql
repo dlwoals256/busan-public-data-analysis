@@ -1,7 +1,6 @@
-CREATE TABLE IF NOT EXISTS raw_data (
+CREATE TABLE IF NOT EXISTS electronic_car_charger (
     id          SERIAL PRIMARY KEY,
-    source      VARCHAR(50) NOT NULL,
-    collected_at  TIMESTAMPZ NOT NULL DEFAULT NOW(),
+    collected_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     payload     JSONB NOT NULL
 );
 

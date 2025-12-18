@@ -5,9 +5,42 @@ from typing import Any, Dict
 
 import requests
 import psycopg2
+from psycopg2 import sql
 from psycopg2.extras import Json
 from psycopg2.extensions import connection
+import xml.etree.ElementTree as ET
 from dotenv import load_dotenv
+
+# ----- Utils -----
+
+def xml_to_json(xml_data: str) -> dict:
+    """
+    Convert XML string to JSON.
+    
+    Args:
+        xml_data (str): XML data as a string.
+    
+    Returns:
+        dict: JSON representation of the XML data.
+    """
+    try:
+        root = ET.fromstring(xml_data)
+        
+        def parse_element(element):
+            # Parse an XML element into a dictionary
+            parsed_data = {}
+            for child in element:
+                if len(child) > 0:
+                    parsed_data[child.tag] = parse_element(child)
+                else:
+                    parsed_data[child.tag] = child.text
+            return parsed_data
+        
+        return {root.tag: parse_element(root)}
+    
+    except ET.ParseError as e:
+        print(f"[ERROR] Failed to parse XML: {e}")
+        raise
 
 # ----- DB -----
 
@@ -31,52 +64,38 @@ def get_connection(
         print(f'[FATAL] Failed to connect DB: {e}', file=sys.stderr)
         raise
 
-def insert_raw_payload(
-        conn:connection,
-        source:str,
-        payload:Dict[str, Any]
-    ) -> None:
-    '''
-    Insert one data into the table raw_data
-    '''
+def save_payload(xml:str, conn, table_name):
+    try:
+        json_dict = xml_to_json(xml)
 
-    with conn.cursor() as cur:
-        cur.execute(
-            '''
-            INSERT INTO raw_data(source, payload)
-            VALUES (%s, %s)
-            ''',
-            (source, Json(payload))
+        query = sql.SQL('INSERT INTO {table} (payload) VALUES (%s)').format(
+            table=sql.Identifier(table_name)
         )
-    conn.commit()
+
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(query, [Json(json_dict)])
+        
+        print(f"[INFO] Successfully saved to table: {table_name}")
+
+    except Exception as e:
+        print(f"[ERROR] Save did not successed: {e}", file=sys.stderr)
 
 
 # ----- API -----
 
 def fetch_data(
     base_url:str,
-    api_key:str    
+    api_key:str,
+    params:dict
     ) -> Dict[str, Any]:
     '''
     Return JSON by calling API
     '''
     if not base_url or not api_key:
         raise RuntimeError('BASE_URL or API_KEY is missing')
-    
-    params = {
-        'serviceKey' : api_key,
-        'pageNo'     : 1,
-        'numOfRows'  : 100,
-    }
 
     resp = requests.get(base_url, params=params, timeout=15)
     resp.raise_for_status()
 
-    try:
-        data = resp.json()
-    except json.JSONDecodeError:
-        print('[ERROR] Response was not JSON as following 500 example contents of it:')
-        print(resp.text[:500])
-        raise
-
-    return data
+    return resp
