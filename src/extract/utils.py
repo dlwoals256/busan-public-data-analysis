@@ -11,6 +11,8 @@ from psycopg2.extensions import connection
 import xml.etree.ElementTree as ET
 from dotenv import load_dotenv
 
+from src.common.config import settings
+
 # ----- Utils -----
 
 def xml_to_json(xml_data: str) -> dict:
@@ -44,21 +46,9 @@ def xml_to_json(xml_data: str) -> dict:
 
 # ----- DB -----
 
-def get_connection(
-        host:str,
-        port:int,
-        dbname:str,
-        user:str,
-        password:str
-    ) -> connection:
+def get_connection() -> connection:
     try:
-        conn = psycopg2.connect(
-            host=host,
-            port=port,
-            dbname=dbname,
-            user=user,
-            password=password
-        )
+        conn = psycopg2.connect(settings.DATABASE_URL)
         return conn
     except Exception as e:
         print(f'[FATAL] Failed to connect DB: {e}', file=sys.stderr)

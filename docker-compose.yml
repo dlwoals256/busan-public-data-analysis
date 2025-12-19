@@ -15,6 +15,8 @@ services:
 
   app:
     build: .
+    environment:
+      - PYTHONPATH=/app
     container_name: extract
     depends_on:
       - db
