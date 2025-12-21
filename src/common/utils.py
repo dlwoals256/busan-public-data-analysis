@@ -71,6 +71,20 @@ def save_payload(xml:str, conn, table_name):
     except Exception as e:
         print(f"[ERROR] Save did not successed: {e}", file=sys.stderr)
 
+def retrieve_data(conn:connection, table_name, schema_name='public', columns='*', limit=None):
+    with conn.cursor() as cur:
+        query = sql.SQL('SELECT {cols} FROM {schema}.{table}').format(
+            cols=sql.SQL(columns) if isinstance(columns, str) else sql.SQL(',').join(map(sql.Identifier, columns)),
+            schema=sql.Identifier(schema_name),
+            table=sql.Identifier(table_name)
+        )
+        if limit:
+            query += sql.SQL(' LIMIT {limit}').format(limit=sql.Literal(limit))
+        
+        cur.execute(query)
+        colnames = [desc[0] for desc in cur.description]
+        
+        return cur.fetchall(), colnames
 
 # ----- API -----
 

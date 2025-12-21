@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings:
-    DB_HOST     = os.getenv('DB_HOST')
+    DEBUG       = os.getenv('DEBUG', 'False').lower() == 'true'
+
+    DB_HOST     = os.getenv('DB_HOST_LOCAL') if DEBUG == True else os.getenv('DB_HOST_DOCKER')
     DB_PORT     = int(os.getenv('DB_PORT'))
     DB_NAME     = os.getenv('DB_NAME')
     DB_USER     = os.getenv('DB_USER')

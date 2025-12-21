@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 from src.common.config import settings
 
-from utils import (
+from src.common.utils import (
     get_connection,
     fetch_data,
     save_payload
