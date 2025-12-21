@@ -10,3 +10,5 @@ scikit-learn
 xgboost
 jupyter
 python-dotenv
+xmltodict
+sqlalchemy

@@ -10,39 +10,14 @@ from psycopg2.extras import Json
 from psycopg2.extensions import connection
 import xml.etree.ElementTree as ET
 from dotenv import load_dotenv
+import xmltodict
 
 from src.common.config import settings
 
 # ----- Utils -----
 
 def xml_to_json(xml_data: str) -> dict:
-    """
-    Convert XML string to JSON.
-    
-    Args:
-        xml_data (str): XML data as a string.
-    
-    Returns:
-        dict: JSON representation of the XML data.
-    """
-    try:
-        root = ET.fromstring(xml_data)
-        
-        def parse_element(element):
-            # Parse an XML element into a dictionary
-            parsed_data = {}
-            for child in element:
-                if len(child) > 0:
-                    parsed_data[child.tag] = parse_element(child)
-                else:
-                    parsed_data[child.tag] = child.text
-            return parsed_data
-        
-        return {root.tag: parse_element(root)}
-    
-    except ET.ParseError as e:
-        print(f"[ERROR] Failed to parse XML: {e}")
-        raise
+    return xmltodict.parse(xml_data)
 
 # ----- DB -----
 
