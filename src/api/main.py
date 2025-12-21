@@ -12,7 +12,7 @@ def get_db():
     finally:
         db.close()
 
-@app.get('/chargers', response_model=list[schemas.EVChargerResponse])
+@app.get('/api/stats/busan', response_model=list[schemas.EVChargerResponse])
 def get_chargers(
     skip:int=0,
     limit:int=100,
