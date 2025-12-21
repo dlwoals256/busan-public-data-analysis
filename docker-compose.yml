@@ -44,5 +44,20 @@ services:
     working_dir: /app
     command: ["python", "-u", "-m", "src.transform.transform"]
 
+  server:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    container_name: server
+    depends_on:
+      transformer:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    working_dir: /app
+    command: ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
 volumes:
   db_data:

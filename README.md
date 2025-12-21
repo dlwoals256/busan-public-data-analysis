@@ -28,6 +28,15 @@ DB_PASSWORD=
 - `DB_USER`: DB user. Leave it just as the first as `aiant`.
 - `DB_PASSWORD`: DB password. You can make your own.
 
+# How to run?
+
+1. Set your `.env` file up.
+2. Install docker and docker compose.
+3. Type the command(on Ubuntu 22.04 Desktop):
+    ```
+    docker compose up --build
+    ```
+
 # Bug note
 
 ## Inatall
